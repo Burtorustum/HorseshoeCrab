@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "horseshoecrab",
+  "version": "${version}",
+  "name": "HorseshoeCrab",
+  "description": "Adds horseshoe crabs!",
+  "authors": ["Burtorustum"],
+  "contact": {
+    "homepage": "",
+    "sources": ""
+  },
+  "license": "MIT",
+  "icon": "assets/horseshoecrab/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "fabric-datagen": [
+      "com.aburustum.horseshoecrab.client.HorseshoeCrabDataGenerator"
+    ],
+    "client": [
+      "com.aburustum.horseshoecrab.client.HorseshoeCrabClient"
+    ],
+    "main": [
+      "com.aburustum.horseshoecrab.HorseshoeCrab"
+    ]
+  },
+  "mixins": [
+    "horseshoecrab.mixins.json",
+    {
+      "config": "horseshoecrab.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-language-kotlin": ">=${kotlin_loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
