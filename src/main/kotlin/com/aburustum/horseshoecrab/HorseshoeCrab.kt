@@ -4,6 +4,7 @@ import com.aburustum.horseshoecrab.entity.ModEntities
 import com.aburustum.horseshoecrab.entity.custom.HorseshoeCrabEntity
 import com.aburustum.horseshoecrab.item.ModItemGroups
 import com.aburustum.horseshoecrab.item.ModItems
+import com.aburustum.horseshoecrab.world.gen.ModWorldGeneration
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricDefaultAttributeRegistry
 import org.slf4j.Logger
@@ -21,8 +22,9 @@ class HorseshoeCrab : ModInitializer {
         ModItems.registerModItems()
 
         ModEntities.registerModEntities()
-
         FabricDefaultAttributeRegistry.register(ModEntities.HORSESHOE_CRAB, HorseshoeCrabEntity.createAttributes())
+
+        ModWorldGeneration.generateModWorldGen()
 
         LOGGER.info("HorseshoeCrab initialized")
     }

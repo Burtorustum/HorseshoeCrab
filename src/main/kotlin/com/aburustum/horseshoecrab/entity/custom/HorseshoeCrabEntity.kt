@@ -1,6 +1,7 @@
 package com.aburustum.horseshoecrab.entity.custom
 
 import com.aburustum.horseshoecrab.entity.ModEntities
+import net.minecraft.block.TurtleEggBlock
 import net.minecraft.entity.AnimationState
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.SpawnReason
@@ -9,11 +10,15 @@ import net.minecraft.entity.attribute.DefaultAttributeContainer
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.passive.AnimalEntity
 import net.minecraft.entity.passive.PassiveEntity
+import net.minecraft.entity.passive.TurtleEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.recipe.Ingredient
 import net.minecraft.server.world.ServerWorld
+import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.random.Random
 import net.minecraft.world.World
+import net.minecraft.world.WorldAccess
 
 class HorseshoeCrabEntity(
     entityType: EntityType<out AnimalEntity>,
@@ -28,6 +33,14 @@ class HorseshoeCrabEntity(
                 .add(EntityAttributes.MAX_HEALTH, 10.0)
                 .add(EntityAttributes.MOVEMENT_SPEED, 0.2)
                 .add(EntityAttributes.STEP_HEIGHT, 0.5)
+
+        fun canSpawn(
+            type: EntityType<HorseshoeCrabEntity>,
+            world: WorldAccess,
+            spawnReason: SpawnReason,
+            pos: BlockPos,
+            random: Random,
+        ): Boolean = pos.y < world.seaLevel + 2 && isLightLevelValidForNaturalSpawn(world, pos)
     }
 
     override fun initGoals() {
