@@ -9,30 +9,30 @@ class HorseshoeCrabAnimations {
     companion object {
         val ANIM_IDLE: AnimationDefinition =
             AnimationDefinition.Builder
-                .create(4.0F)
+                .create(4.0f)
                 .looping()
                 .addBoneAnimation(
                     "crab",
                     Transformation(
                         Transformation.Targets.ROTATE,
                         Keyframe(
-                            0.0F,
-                            AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F),
+                            0.0f,
+                            AnimationHelper.createRotationalVector(0.0f, 0.0f, 0.0f),
                             Transformation.Interpolations.LINEAR,
                         ),
                         Keyframe(
-                            1.0F,
-                            AnimationHelper.createRotationalVector(0.0F, 20.0F, 0.0F),
+                            1.0f,
+                            AnimationHelper.createRotationalVector(0.0f, -10.0f, 0.0f),
                             Transformation.Interpolations.LINEAR,
                         ),
                         Keyframe(
-                            3.0F,
-                            AnimationHelper.createRotationalVector(0.0F, -20.0F, 0.0F),
+                            3.0f,
+                            AnimationHelper.createRotationalVector(0.0f, 10.0f, 0.0f),
                             Transformation.Interpolations.LINEAR,
                         ),
                         Keyframe(
-                            4.0F,
-                            AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F),
+                            4.0f,
+                            AnimationHelper.createRotationalVector(0.0f, 0.0f, 0.0f),
                             Transformation.Interpolations.LINEAR,
                         ),
                     ),
@@ -40,25 +40,25 @@ class HorseshoeCrabAnimations {
 
         val ANIM_WALK: AnimationDefinition =
             AnimationDefinition.Builder
-                .create(2F)
+                .create(2.0f)
                 .looping()
                 .addBoneAnimation(
                     "crab",
                     Transformation(
                         Transformation.Targets.ROTATE,
                         Keyframe(
-                            0.0F,
-                            AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F),
+                            0.0f,
+                            AnimationHelper.createRotationalVector(0.0f, 0.0f, 0.0f),
                             Transformation.Interpolations.LINEAR,
                         ),
                         Keyframe(
-                            1.0F,
-                            AnimationHelper.createRotationalVector(0.0F, 0.0F, 10.0F),
+                            1.0f,
+                            AnimationHelper.createRotationalVector(-90.0f, 12.5f, 90.0f),
                             Transformation.Interpolations.LINEAR,
                         ),
                         Keyframe(
-                            2.0F,
-                            AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F),
+                            2.0f,
+                            AnimationHelper.createRotationalVector(0.0f, 0.0f, 0.0f),
                             Transformation.Interpolations.LINEAR,
                         ),
                     ),
@@ -67,18 +67,18 @@ class HorseshoeCrabAnimations {
                     Transformation(
                         Transformation.Targets.MOVE_ORIGIN,
                         Keyframe(
-                            0.0F,
-                            AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F),
+                            0.0f,
+                            AnimationHelper.createTranslationalVector(0.0f, 0.0f, 0.0f),
                             Transformation.Interpolations.LINEAR,
                         ),
                         Keyframe(
-                            1.0F,
-                            AnimationHelper.createTranslationalVector(-1.0F, 0.0F, 0.0F),
+                            1.0f,
+                            AnimationHelper.createTranslationalVector(0.0f, 0.0f, -1.0f),
                             Transformation.Interpolations.LINEAR,
                         ),
                         Keyframe(
-                            2.0F,
-                            AnimationHelper.createTranslationalVector(-3.0F, 0.0F, 0.0F),
+                            2.0f,
+                            AnimationHelper.createTranslationalVector(0.0f, 0.0f, -3.0f),
                             Transformation.Interpolations.LINEAR,
                         ),
                     ),
