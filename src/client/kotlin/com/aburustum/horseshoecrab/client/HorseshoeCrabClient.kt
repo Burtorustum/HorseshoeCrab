@@ -9,7 +9,10 @@ import net.minecraft.client.render.entity.EntityRendererFactories
 
 class HorseshoeCrabClient : ClientModInitializer {
     override fun onInitializeClient() {
-        EntityModelLayerRegistry.registerModelLayer(HorseshoeCrabModel.HORSESHOE_CRAB, HorseshoeCrabModel::getTexturedModelData)
-        EntityRendererFactories.register(ModEntities.HORSESHOE_CRAB) { HorseshoeCrabRenderer(it) }
+        EntityModelLayerRegistry.registerModelLayer(
+            HorseshoeCrabModel.HORSESHOE_CRAB,
+            HorseshoeCrabModel::getTexturedModelData,
+        )
+        EntityRendererFactories.register(ModEntities.HORSESHOE_CRAB, ::HorseshoeCrabRenderer)
     }
 }

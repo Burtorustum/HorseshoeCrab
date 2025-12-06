@@ -17,7 +17,7 @@ class ModEntities {
                 Registries.ENTITY_TYPE,
                 Identifier.of(HorseshoeCrab.MOD_ID, "crab"),
                 EntityType.Builder
-                    .create({ type, world -> HorseshoeCrabEntity(type, world) }, SpawnGroup.CREATURE)
+                    .create({ type, world -> HorseshoeCrabEntity(type, world) }, SpawnGroup.WATER_AMBIENT)
                     .dimensions(0.5f, 0.3f)
                     .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(HorseshoeCrab.MOD_ID, "crab"))),
             )

@@ -9,9 +9,8 @@ import net.minecraft.client.render.state.CameraRenderState
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.Identifier
 
-class HorseshoeCrabRenderer(
-    context: EntityRendererFactory.Context,
-) : MobEntityRenderer<HorseshoeCrabEntity, HorseshoeCrabRenderState, HorseshoeCrabModel>(
+class HorseshoeCrabRenderer(context: EntityRendererFactory.Context) :
+    MobEntityRenderer<HorseshoeCrabEntity, HorseshoeCrabRenderState, HorseshoeCrabModel>(
         context,
         HorseshoeCrabModel(context.getPart(HorseshoeCrabModel.HORSESHOE_CRAB)),
         0.75f,
@@ -35,11 +34,7 @@ class HorseshoeCrabRenderer(
 
     override fun createRenderState(): HorseshoeCrabRenderState = HorseshoeCrabRenderState()
 
-    override fun updateRenderState(
-        livingEntity: HorseshoeCrabEntity,
-        livingEntityRenderState: HorseshoeCrabRenderState,
-        f: Float,
-    ) {
+    override fun updateRenderState(livingEntity: HorseshoeCrabEntity, livingEntityRenderState: HorseshoeCrabRenderState, f: Float) {
         super.updateRenderState(livingEntity, livingEntityRenderState, f)
         livingEntityRenderState.idleAnimationState.copyFrom(livingEntity.idleAnimationState)
     }

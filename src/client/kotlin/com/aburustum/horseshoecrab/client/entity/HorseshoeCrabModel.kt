@@ -1,15 +1,18 @@
 package com.aburustum.horseshoecrab.client.entity
 
 import com.aburustum.horseshoecrab.HorseshoeCrab
-import net.minecraft.client.model.*
+import net.minecraft.client.model.Dilation
+import net.minecraft.client.model.ModelData
+import net.minecraft.client.model.ModelPart
+import net.minecraft.client.model.ModelPartBuilder
+import net.minecraft.client.model.ModelTransform
+import net.minecraft.client.model.TexturedModelData
 import net.minecraft.client.render.entity.animation.Animation
 import net.minecraft.client.render.entity.model.EntityModel
 import net.minecraft.client.render.entity.model.EntityModelLayer
 import net.minecraft.util.Identifier
 
-class HorseshoeCrabModel(
-    root: ModelPart,
-) : EntityModel<HorseshoeCrabRenderState>(root) {
+class HorseshoeCrabModel(root: ModelPart) : EntityModel<HorseshoeCrabRenderState>(root) {
     private val crab: ModelPart = root.getChild("crab")
 
     private val walkingAnimation: Animation = HorseshoeCrabAnimations.ANIM_WALK.createAnimation(root)

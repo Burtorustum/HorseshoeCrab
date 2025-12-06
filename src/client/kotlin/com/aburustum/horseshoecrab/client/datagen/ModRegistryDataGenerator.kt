@@ -6,14 +6,9 @@ import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.RegistryWrapper
 import java.util.concurrent.CompletableFuture
 
-class ModRegistryDataGenerator(
-    output: FabricDataOutput,
-    registriesFuture: CompletableFuture<RegistryWrapper.WrapperLookup>,
-) : FabricDynamicRegistryProvider(output, registriesFuture) {
-    protected override fun configure(
-        registries: RegistryWrapper.WrapperLookup,
-        entries: Entries,
-    ) {
+class ModRegistryDataGenerator(output: FabricDataOutput, registriesFuture: CompletableFuture<RegistryWrapper.WrapperLookup>) :
+    FabricDynamicRegistryProvider(output, registriesFuture) {
+    protected override fun configure(registries: RegistryWrapper.WrapperLookup, entries: Entries) {
         entries.addAll(registries.getOrThrow(RegistryKeys.CONFIGURED_FEATURE))
         entries.addAll(registries.getOrThrow(RegistryKeys.PLACED_FEATURE))
     }

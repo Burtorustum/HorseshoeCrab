@@ -7,9 +7,7 @@ import net.minecraft.client.data.BlockStateModelGenerator
 import net.minecraft.client.data.ItemModelGenerator
 import net.minecraft.client.data.Models
 
-class ModModelProvider(
-    output: FabricDataOutput,
-) : FabricModelProvider(output) {
+class ModModelProvider(output: FabricDataOutput) : FabricModelProvider(output) {
     override fun generateBlockStateModels(blockStateModelGenerator: BlockStateModelGenerator) {
     }
 
