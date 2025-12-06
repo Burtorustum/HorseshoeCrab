@@ -1,36 +1,36 @@
 package com.aburustum.horseshoecrab.entity.custom
 
 import com.aburustum.horseshoecrab.entity.ModEntities
-import net.minecraft.block.Blocks
-import net.minecraft.entity.AnimationState
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.SpawnReason
-import net.minecraft.entity.ai.goal.FollowParentGoal
-import net.minecraft.entity.ai.goal.Goal
-import net.minecraft.entity.ai.goal.MoveToTargetPosGoal
-import net.minecraft.entity.ai.goal.TemptGoal
-import net.minecraft.entity.ai.goal.WanderAroundGoal
-import net.minecraft.entity.ai.pathing.AmphibiousSwimNavigation
-import net.minecraft.entity.ai.pathing.EntityNavigation
-import net.minecraft.entity.ai.pathing.PathNodeType
-import net.minecraft.entity.attribute.DefaultAttributeContainer
-import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.entity.passive.AnimalEntity
-import net.minecraft.entity.passive.PassiveEntity
-import net.minecraft.item.ItemStack
-import net.minecraft.item.Items
-import net.minecraft.recipe.Ingredient
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.random.Random
-import net.minecraft.world.World
-import net.minecraft.world.WorldAccess
-import net.minecraft.world.WorldView
+import net.minecraft.core.BlockPos
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.util.RandomSource
+import net.minecraft.world.entity.AgeableMob
+import net.minecraft.world.entity.AnimationState
+import net.minecraft.world.entity.EntitySpawnReason
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier
+import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.entity.ai.goal.FollowParentGoal
+import net.minecraft.world.entity.ai.goal.Goal
+import net.minecraft.world.entity.ai.goal.MoveToBlockGoal
+import net.minecraft.world.entity.ai.goal.RandomStrollGoal
+import net.minecraft.world.entity.ai.goal.TemptGoal
+import net.minecraft.world.entity.ai.navigation.AmphibiousPathNavigation
+import net.minecraft.world.entity.ai.navigation.PathNavigation
+import net.minecraft.world.entity.animal.Animal
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.item.crafting.Ingredient
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.LevelAccessor
+import net.minecraft.world.level.LevelReader
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.pathfinder.PathType
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-class HorseshoeCrabEntity(entityType: EntityType<out HorseshoeCrabEntity>, world: World) : AnimalEntity(entityType, world) {
+class HorseshoeCrabEntity(entityType: EntityType<out HorseshoeCrabEntity>, world: Level) : Animal(entityType, world) {
     val idleAnimationState: AnimationState = AnimationState()
     private var idleAnimationTimeout = 0
 
@@ -41,22 +41,22 @@ class HorseshoeCrabEntity(entityType: EntityType<out HorseshoeCrabEntity>, world
     var isCongoLineLeader: Boolean = false
 
     init {
-        this.setPathfindingPenalty(PathNodeType.WATER, 0.0f)
+        this.setPathfindingMalus(PathType.WATER, 0.0f)
     }
 
     companion object {
-        fun createAttributes(): DefaultAttributeContainer.Builder = createAnimalAttributes()
-            .add(EntityAttributes.MAX_HEALTH, 5.0)
-            .add(EntityAttributes.MOVEMENT_SPEED, 0.25)
-            .add(EntityAttributes.ATTACK_DAMAGE, 1.0)
-            .add(EntityAttributes.ATTACK_KNOCKBACK, 0.0)
+        fun createAttributes(): AttributeSupplier.Builder = createAnimalAttributes()
+            .add(Attributes.MAX_HEALTH, 5.0)
+            .add(Attributes.MOVEMENT_SPEED, 0.25)
+            .add(Attributes.ATTACK_DAMAGE, 1.0)
+            .add(Attributes.ATTACK_KNOCKBACK, 0.0)
 
         fun canSpawn(
             type: EntityType<HorseshoeCrabEntity>,
-            world: WorldAccess,
-            reason: SpawnReason,
+            world: LevelAccessor,
+            reason: EntitySpawnReason,
             pos: BlockPos,
-            random: Random,
+            random: RandomSource,
         ): Boolean {
             val seaLevel = world.seaLevel
             val shallowDepthMin = seaLevel - 8
@@ -64,38 +64,34 @@ class HorseshoeCrabEntity(entityType: EntityType<out HorseshoeCrabEntity>, world
 
             return pos.y in shallowDepthMin..shallowDepthMax
                 // && world.isWater(pos)
-                && world.getBlockState(pos.down()).isSolid
-                && world.isSkyVisibleAllowingSea(pos)
+                && world.getBlockState(pos.below()).isSolid
+                && world.canSeeSkyFromBelowWater(pos)
         }
     }
 
-    override fun isPushedByFluids(): Boolean = false
+    override fun isPushedByFluid(): Boolean = false
 
     override fun canBeLeashed(): Boolean = true
 
-    override fun isBreedingItem(stack: ItemStack): Boolean = stack.isOf(Items.KELP)
+    override fun isFood(stack: ItemStack): Boolean = stack.`is`(Items.KELP)
 
-    override fun canBreatheInWater(): Boolean = true
+    override fun canBreatheUnderwater(): Boolean = true
 
-    override fun getMaxAir(): Int = 6000 // 5 minutes of air (20 ticks per second * 60 * 5)
+    override fun registerGoals() {
+        this.goalSelector.addGoal(0, CongoLineBreedingGoal(this, 0.7))
+        this.goalSelector.addGoal(1, CrawlOnBottomGoal(this))
 
-    override fun canSpawn(world: WorldAccess?, spawnReason: SpawnReason?): Boolean = super.canSpawn(world, spawnReason)
+        this.goalSelector.addGoal(2, TemptGoal(this, 0.7, Ingredient.of(Items.KELP), false))
 
-    override fun initGoals() {
-        this.goalSelector.add(0, CongoLineBreedingGoal(this, 0.7))
-        this.goalSelector.add(1, CrawlOnBottomGoal(this))
-
-        this.goalSelector.add(2, TemptGoal(this, 0.7, Ingredient.ofItem(Items.KELP), false))
-
-        this.goalSelector.add(3, FollowParentGoal(this, 1.05))
-        this.goalSelector.add(4, WanderInWaterGoal(this, 0.55))
-        this.goalSelector.add(5, WanderOnLandGoal(this, 0.55, 100))
+        this.goalSelector.addGoal(3, FollowParentGoal(this, 1.05))
+        this.goalSelector.addGoal(4, WanderInWaterGoal(this, 0.55))
+        this.goalSelector.addGoal(5, WanderOnLandGoal(this, 0.55, 100))
     }
 
     private fun setupAnimationStates() {
         if (this.idleAnimationTimeout <= 0) {
             this.idleAnimationTimeout = 40
-            this.idleAnimationState.start(this.age)
+            this.idleAnimationState.start(this.tickCount)
         } else {
             this.idleAnimationTimeout--
         }
@@ -108,10 +104,10 @@ class HorseshoeCrabEntity(entityType: EntityType<out HorseshoeCrabEntity>, world
     private fun updateOrientation() {
         // Check if entity is swimming: in water and no solid ground within 1 block below
         val isSwimming =
-            if (this.isTouchingWater) {
-                val posBelow = this.blockPos.down()
-                val blockBelow = this.entityWorld.getBlockState(posBelow)
-                !blockBelow.isSolidBlock(this.entityWorld, posBelow)
+            if (this.isInWater) {
+                val posBelow = this.blockPosition().below()
+                val blockBelow = this.level().getBlockState(posBelow)
+                !blockBelow.isRedstoneConductor(this.level(), posBelow)
             } else {
                 false
             }
@@ -147,22 +143,17 @@ class HorseshoeCrabEntity(entityType: EntityType<out HorseshoeCrabEntity>, world
         orientationTransition = orientationTransition.coerceIn(0.0f, 1.0f)
     }
 
-    override fun createChild(world: ServerWorld, entity: PassiveEntity): PassiveEntity? =
-        ModEntities.HORSESHOE_CRAB.create(world, SpawnReason.BREEDING)
+    override fun getBreedOffspring(world: ServerLevel, entity: AgeableMob): AgeableMob? =
+        ModEntities.HORSESHOE_CRAB.create(world, EntitySpawnReason.BREEDING)
 
-    override fun createNavigation(world: World): EntityNavigation = BottomCrawlingNavigation(this, world)
+    override fun createNavigation(world: Level): PathNavigation = BottomCrawlingNavigation(this, world)
 
     // Always restore air when in water
     override fun tick() {
         super.tick()
 
-        if (this.entityWorld.isClient) {
+        if (this.level().isClientSide) {
             this.setupAnimationStates()
-        }
-
-        // Restore air when in water (prevents drowning)
-        if (this.isTouchingWater) {
-            this.air = this.maxAir
         }
 
         // Update orientation state every tick
@@ -172,14 +163,14 @@ class HorseshoeCrabEntity(entityType: EntityType<out HorseshoeCrabEntity>, world
     /**
      * Custom navigation for horseshoe crabs that prefers bottom surfaces
      */
-    private class BottomCrawlingNavigation(entity: HorseshoeCrabEntity, world: World) : AmphibiousSwimNavigation(entity, world) {
-        override fun isValidPosition(pos: BlockPos): Boolean {
-            val blockState = this.world.getBlockState(pos)
-            val blockBelow = this.world.getBlockState(pos.down())
+    private class BottomCrawlingNavigation(entity: HorseshoeCrabEntity, world: Level) : AmphibiousPathNavigation(entity, world) {
+        override fun isStableDestination(pos: BlockPos): Boolean {
+            val blockState = this.level.getBlockState(pos)
+            val blockBelow = this.level.getBlockState(pos.below())
 
             // If in water, require solid block beneath
-            if (blockState.isOf(Blocks.WATER)) {
-                return blockBelow.isSolidBlock(this.world, pos.down())
+            if (blockState.`is`(Blocks.WATER)) {
+                return blockBelow.isRedstoneConductor(this.level, pos.below())
             }
 
             // On land, just ensure we're not in air
@@ -188,51 +179,51 @@ class HorseshoeCrabEntity(entityType: EntityType<out HorseshoeCrabEntity>, world
     }
 
     private class WanderInWaterGoal(private val crab: HorseshoeCrabEntity, speed: Double) :
-        MoveToTargetPosGoal(crab, if (crab.isBaby) 0.65 else speed, 24) {
+        MoveToBlockGoal(crab, if (crab.isBaby) 0.65 else speed, 24) {
         init {
-            this.lowestY = -1
+            this.verticalSearchStart = -1
         }
 
-        override fun shouldContinue(): Boolean = !this.crab.isTouchingWater &&
-            this.tryingTime <= 1200 &&
-            this.isTargetPos(this.crab.entityWorld, this.targetPos)
+        override fun canContinueToUse(): Boolean = !this.crab.isInWater &&
+            this.tryTicks <= 1200 &&
+            this.isValidTarget(this.crab.level(), this.blockPos)
 
-        override fun canStart(): Boolean = if (this.crab.isBaby && !this.crab.isTouchingWater) {
-            super.canStart()
-        } else if (!this.crab.isTouchingWater) {
-            super.canStart()
+        override fun canUse(): Boolean = if (this.crab.isBaby && !this.crab.isInWater) {
+            super.canUse()
+        } else if (!this.crab.isInWater) {
+            super.canUse()
         } else {
             false
         }
 
-        override fun shouldResetPath(): Boolean = this.tryingTime % 160 == 0
+        override fun shouldRecalculatePath(): Boolean = this.tryTicks % 160 == 0
 
-        override fun isTargetPos(world: WorldView, pos: BlockPos?): Boolean = world.getBlockState(pos).isOf(Blocks.WATER)
+        override fun isValidTarget(world: LevelReader, pos: BlockPos): Boolean = world.getBlockState(pos).`is`(Blocks.WATER)
     }
 
     private class WanderOnLandGoal(private val crab: HorseshoeCrabEntity, speed: Double, chance: Int) :
-        WanderAroundGoal(crab, speed, chance) {
-        override fun canStart(): Boolean = if (this.crab.isTouchingWater) super.canStart() else false
+        RandomStrollGoal(crab, speed, chance) {
+        override fun canUse(): Boolean = if (this.crab.isInWater) super.canUse() else false
     }
 
     /**
      * AI goal that makes horseshoe crabs sink to the bottom when in water
      */
     private class CrawlOnBottomGoal(private val crab: HorseshoeCrabEntity) : Goal() {
-        override fun canStart(): Boolean {
+        override fun canUse(): Boolean {
             // Start if in water and not touching ground
-            return crab.isTouchingWater && !crab.isOnGround
+            return crab.isInWater && !crab.onGround()
         }
 
-        override fun shouldContinue(): Boolean {
+        override fun canContinueToUse(): Boolean {
             // Continue while in water and not on ground
-            return crab.isTouchingWater && !crab.isOnGround
+            return crab.isInWater && !crab.onGround()
         }
 
         override fun tick() {
             // Apply downward velocity to sink to bottom
-            val velocity = crab.velocity
-            crab.setVelocity(velocity.x, velocity.y - 0.05, velocity.z)
+            val velocity = crab.deltaMovement
+            crab.setDeltaMovement(velocity.x, velocity.y - 0.05, velocity.z)
         }
     }
 
@@ -246,7 +237,7 @@ class HorseshoeCrabEntity(entityType: EntityType<out HorseshoeCrabEntity>, world
         private val alignmentThreshold: Double = 1.5 // blocks
         private val detectionRange: Double = 8.0 // blocks
 
-        override fun canStart(): Boolean {
+        override fun canUse(): Boolean {
             // Only start if this crab is in love mode (fed kelp)
             if (!crab.isInLove) {
                 return false
@@ -263,7 +254,7 @@ class HorseshoeCrabEntity(entityType: EntityType<out HorseshoeCrabEntity>, world
             return false
         }
 
-        override fun shouldContinue(): Boolean {
+        override fun canContinueToUse(): Boolean {
             val currentPartner = partner
 
             // Stop if partner is gone or no longer in love mode
@@ -272,7 +263,7 @@ class HorseshoeCrabEntity(entityType: EntityType<out HorseshoeCrabEntity>, world
             }
 
             // Stop if partner is too far away
-            if (crab.squaredDistanceTo(currentPartner) > detectionRange * detectionRange) {
+            if (crab.distanceToSqr(currentPartner) > detectionRange * detectionRange) {
                 return false
             }
 
@@ -296,7 +287,7 @@ class HorseshoeCrabEntity(entityType: EntityType<out HorseshoeCrabEntity>, world
             if (crab.isCongoLineLeader) {
                 // Leader just needs to stay relatively still or move slowly
                 // The follower will position itself behind the leader
-                crab.lookAtEntity(currentPartner, 30.0f, 30.0f)
+                crab.lookAt(currentPartner, 30.0f, 30.0f)
             } else {
                 // Follower moves to position behind leader
                 moveToFormation(currentPartner)
@@ -321,9 +312,9 @@ class HorseshoeCrabEntity(entityType: EntityType<out HorseshoeCrabEntity>, world
          */
         private fun findPartner(): HorseshoeCrabEntity? {
             val nearbyEntities =
-                crab.entityWorld.getEntitiesByClass(
+                crab.level().getEntitiesOfClass(
                     HorseshoeCrabEntity::class.java,
-                    crab.boundingBox.expand(detectionRange),
+                    crab.boundingBox.inflate(detectionRange),
                     { entity ->
                         entity != crab &&
                             entity.isAlive &&
@@ -332,7 +323,7 @@ class HorseshoeCrabEntity(entityType: EntityType<out HorseshoeCrabEntity>, world
                     },
                 )
 
-            return nearbyEntities.minByOrNull { crab.squaredDistanceTo(it) }
+            return nearbyEntities.minByOrNull { crab.distanceToSqr(it) }
         }
 
         /**
@@ -354,7 +345,7 @@ class HorseshoeCrabEntity(entityType: EntityType<out HorseshoeCrabEntity>, world
          */
         private fun moveToFormation(leader: HorseshoeCrabEntity) {
             // Calculate position behind leader
-            val leaderYaw = Math.toRadians(leader.yaw.toDouble())
+            val leaderYaw = Math.toRadians(leader.yRot.toDouble())
             val offsetX = -sin(leaderYaw) * 1.5 // 1.5 blocks behind
             val offsetZ = cos(leaderYaw) * 1.5
 
@@ -364,10 +355,10 @@ class HorseshoeCrabEntity(entityType: EntityType<out HorseshoeCrabEntity>, world
 
             // Navigate to target position
             val targetPos = BlockPos(targetX.toInt(), targetY.toInt(), targetZ.toInt())
-            crab.navigation.startMovingTo(targetX, targetY, targetZ, speed)
+            crab.navigation.moveTo(targetX, targetY, targetZ, speed)
 
             // Look at leader
-            crab.lookAtEntity(leader, 30.0f, 30.0f)
+            crab.lookAt(leader, 30.0f, 30.0f)
         }
 
         /**
@@ -378,7 +369,7 @@ class HorseshoeCrabEntity(entityType: EntityType<out HorseshoeCrabEntity>, world
             val follower = if (crab.isCongoLineLeader) partner else crab
 
             // Calculate expected position behind leader
-            val leaderYaw = Math.toRadians(leader.yaw.toDouble())
+            val leaderYaw = Math.toRadians(leader.yRot.toDouble())
             val expectedOffsetX = -sin(leaderYaw) * 1.5
             val expectedOffsetZ = cos(leaderYaw) * 1.5
 
@@ -398,11 +389,11 @@ class HorseshoeCrabEntity(entityType: EntityType<out HorseshoeCrabEntity>, world
          */
         private fun breed(partner: HorseshoeCrabEntity) {
             // Use Minecraft's built-in breeding logic
-            crab.breed(crab.entityWorld as ServerWorld, partner)
+            crab.spawnChildFromBreeding(crab.level() as ServerLevel, partner)
 
             // Reset love mode
-            crab.resetLoveTicks()
-            partner.resetLoveTicks()
+            crab.resetLove()
+            partner.resetLove()
 
             // Clear congo line state
             stop()

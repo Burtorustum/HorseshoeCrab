@@ -5,11 +5,11 @@ import com.aburustum.horseshoecrab.entity.ModEntities
 import com.aburustum.horseshoecrab.entity.custom.HorseshoeCrabEntity
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors
-import net.minecraft.entity.SpawnGroup
-import net.minecraft.entity.SpawnLocationTypes
-import net.minecraft.entity.SpawnRestriction
-import net.minecraft.world.Heightmap
-import net.minecraft.world.biome.BiomeKeys
+import net.minecraft.world.entity.MobCategory
+import net.minecraft.world.entity.SpawnPlacementTypes
+import net.minecraft.world.entity.SpawnPlacements
+import net.minecraft.world.level.biome.Biomes
+import net.minecraft.world.level.levelgen.Heightmap
 
 class ModEntitySpawns {
     companion object {
@@ -18,22 +18,22 @@ class ModEntitySpawns {
 
             BiomeModifications.addSpawn(
                 BiomeSelectors.includeByKey(
-                    BiomeKeys.BEACH,
-                    BiomeKeys.OCEAN,
-                    BiomeKeys.WARM_OCEAN,
-                    BiomeKeys.LUKEWARM_OCEAN,
-                    BiomeKeys.COLD_OCEAN,
+                    Biomes.BEACH,
+                    Biomes.OCEAN,
+                    Biomes.WARM_OCEAN,
+                    Biomes.LUKEWARM_OCEAN,
+                    Biomes.COLD_OCEAN,
                 ),
-                SpawnGroup.WATER_AMBIENT, // TODO: custom spawngroup
+                MobCategory.WATER_AMBIENT, // TODO: custom spawngroup
                 ModEntities.HORSESHOE_CRAB,
-                5,
+                10,
                 1,
-                3,
+                4,
             )
-            SpawnRestriction.register(
+            SpawnPlacements.register(
                 ModEntities.HORSESHOE_CRAB,
-                SpawnLocationTypes.UNRESTRICTED,
-                Heightmap.Type.MOTION_BLOCKING_NO_LEAVES,
+                SpawnPlacementTypes.NO_RESTRICTIONS,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 HorseshoeCrabEntity::canSpawn,
             )
         }

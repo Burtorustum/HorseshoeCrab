@@ -1,85 +1,85 @@
 package com.aburustum.horseshoecrab.client.entity
 
-import net.minecraft.client.render.entity.animation.AnimationDefinition
-import net.minecraft.client.render.entity.animation.AnimationHelper
-import net.minecraft.client.render.entity.animation.Keyframe
-import net.minecraft.client.render.entity.animation.Transformation
+import net.minecraft.client.animation.AnimationChannel
+import net.minecraft.client.animation.AnimationDefinition
+import net.minecraft.client.animation.Keyframe
+import net.minecraft.client.animation.KeyframeAnimations
 
 class HorseshoeCrabAnimations {
     companion object {
         val ANIM_IDLE: AnimationDefinition =
             AnimationDefinition.Builder
-                .create(4.0f)
+                .withLength(4.0f)
                 .looping()
-                .addBoneAnimation(
+                .addAnimation(
                     "crab",
-                    Transformation(
-                        Transformation.Targets.ROTATE,
+                    AnimationChannel(
+                        AnimationChannel.Targets.ROTATION,
                         Keyframe(
                             0.0f,
-                            AnimationHelper.createRotationalVector(0.0f, 0.0f, 0.0f),
-                            Transformation.Interpolations.LINEAR,
+                            KeyframeAnimations.degreeVec(0.0f, 0.0f, 0.0f),
+                            AnimationChannel.Interpolations.LINEAR,
                         ),
                         Keyframe(
                             1.0f,
-                            AnimationHelper.createRotationalVector(0.0f, -10.0f, 0.0f),
-                            Transformation.Interpolations.LINEAR,
+                            KeyframeAnimations.degreeVec(0.0f, -10.0f, 0.0f),
+                            AnimationChannel.Interpolations.LINEAR,
                         ),
                         Keyframe(
                             3.0f,
-                            AnimationHelper.createRotationalVector(0.0f, 10.0f, 0.0f),
-                            Transformation.Interpolations.LINEAR,
+                            KeyframeAnimations.degreeVec(0.0f, 10.0f, 0.0f),
+                            AnimationChannel.Interpolations.LINEAR,
                         ),
                         Keyframe(
                             4.0f,
-                            AnimationHelper.createRotationalVector(0.0f, 0.0f, 0.0f),
-                            Transformation.Interpolations.LINEAR,
+                            KeyframeAnimations.degreeVec(0.0f, 0.0f, 0.0f),
+                            AnimationChannel.Interpolations.LINEAR,
                         ),
                     ),
                 ).build()
 
         val ANIM_WALK: AnimationDefinition =
             AnimationDefinition.Builder
-                .create(2.0f)
+                .withLength(2.0f)
                 .looping()
-                .addBoneAnimation(
+                .addAnimation(
                     "crab",
-                    Transformation(
-                        Transformation.Targets.ROTATE,
+                    AnimationChannel(
+                        AnimationChannel.Targets.ROTATION,
                         Keyframe(
                             0.0f,
-                            AnimationHelper.createRotationalVector(0.0f, 0.0f, 0.0f),
-                            Transformation.Interpolations.LINEAR,
+                            KeyframeAnimations.degreeVec(0.0f, 0.0f, 0.0f),
+                            AnimationChannel.Interpolations.LINEAR,
                         ),
                         Keyframe(
                             1.0f,
-                            AnimationHelper.createRotationalVector(-90.0f, 12.5f, 90.0f),
-                            Transformation.Interpolations.LINEAR,
+                            KeyframeAnimations.degreeVec(-90.0f, 12.5f, 90.0f),
+                            AnimationChannel.Interpolations.LINEAR,
                         ),
                         Keyframe(
                             2.0f,
-                            AnimationHelper.createRotationalVector(0.0f, 0.0f, 0.0f),
-                            Transformation.Interpolations.LINEAR,
+                            KeyframeAnimations.degreeVec(0.0f, 0.0f, 0.0f),
+                            AnimationChannel.Interpolations.LINEAR,
                         ),
                     ),
-                ).addBoneAnimation(
+                ).addAnimation(
                     "crab",
-                    Transformation(
-                        Transformation.Targets.MOVE_ORIGIN,
+                    AnimationChannel(
+                        AnimationChannel.Targets.POSITION,
                         Keyframe(
                             0.0f,
-                            AnimationHelper.createTranslationalVector(0.0f, 0.0f, 0.0f),
-                            Transformation.Interpolations.LINEAR,
+                            KeyframeAnimations.posVec(0.0f, 0.0f, 0.0f),
+                            AnimationChannel.Interpolations.LINEAR,
                         ),
                         Keyframe(
                             1.0f,
-                            AnimationHelper.createTranslationalVector(0.0f, 0.0f, -1.0f),
-                            Transformation.Interpolations.LINEAR,
+                            KeyframeAnimations.posVec(0.0f, 0.0f, -1.0f),
+                            AnimationChannel.Interpolations.LINEAR,
                         ),
                         Keyframe(
                             2.0f,
-                            AnimationHelper.createTranslationalVector(0.0f, 0.0f, -3.0f),
-                            Transformation.Interpolations.LINEAR,
+                            KeyframeAnimations.posVec(0.0f, 0.0f, -3.0f),
+                            AnimationChannel.Interpolations.LINEAR,
                         ),
                     ),
                 ).build()

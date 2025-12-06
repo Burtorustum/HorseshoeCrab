@@ -5,7 +5,7 @@ import com.aburustum.horseshoecrab.client.entity.HorseshoeCrabRenderer
 import com.aburustum.horseshoecrab.entity.ModEntities
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry
-import net.minecraft.client.render.entity.EntityRendererFactories
+import net.minecraft.client.renderer.entity.EntityRenderers
 
 class HorseshoeCrabClient : ClientModInitializer {
     override fun onInitializeClient() {
@@ -13,6 +13,6 @@ class HorseshoeCrabClient : ClientModInitializer {
             HorseshoeCrabModel.HORSESHOE_CRAB,
             HorseshoeCrabModel::getTexturedModelData,
         )
-        EntityRendererFactories.register(ModEntities.HORSESHOE_CRAB, ::HorseshoeCrabRenderer)
+        EntityRenderers.register(ModEntities.HORSESHOE_CRAB, ::HorseshoeCrabRenderer)
     }
 }

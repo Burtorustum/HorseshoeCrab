@@ -1,24 +1,24 @@
 package com.aburustum.horseshoecrab.world
 
 import com.aburustum.horseshoecrab.HorseshoeCrab
-import net.minecraft.registry.Registerable
-import net.minecraft.registry.RegistryKey
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.util.Identifier
-import net.minecraft.world.gen.feature.ConfiguredFeature
-import net.minecraft.world.gen.feature.Feature
-import net.minecraft.world.gen.feature.FeatureConfig
+import net.minecraft.core.registries.Registries
+import net.minecraft.data.worldgen.BootstrapContext
+import net.minecraft.resources.ResourceKey
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature
+import net.minecraft.world.level.levelgen.feature.Feature
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration
 
 class ModConfiguredFeatures {
     companion object {
-        fun bootstrap(context: Registerable<ConfiguredFeature<*, *>>) {}
+        fun bootstrap(context: BootstrapContext<ConfiguredFeature<*, *>>) {}
 
-        fun registerKey(name: String): RegistryKey<ConfiguredFeature<*, *>> =
-            RegistryKey.of(RegistryKeys.CONFIGURED_FEATURE, Identifier.of(HorseshoeCrab.MOD_ID, name))
+        fun registerKey(name: String): ResourceKey<ConfiguredFeature<*, *>> =
+            ResourceKey.create(Registries.CONFIGURED_FEATURE, ResourceLocation.fromNamespaceAndPath(HorseshoeCrab.MOD_ID, name))
 
-        private fun <FC : FeatureConfig, F : Feature<FC>> register(
-            context: Registerable<ConfiguredFeature<*, *>>,
-            key: RegistryKey<ConfiguredFeature<*, *>>,
+        private fun <FC : FeatureConfiguration, F : Feature<FC>> register(
+            context: BootstrapContext<ConfiguredFeature<*, *>>,
+            key: ResourceKey<ConfiguredFeature<*, *>>,
             feature: F,
             configuration: FC,
         ) {
