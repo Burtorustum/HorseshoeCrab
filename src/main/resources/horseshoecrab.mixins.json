@@ -4,6 +4,7 @@
   "package": "com.aburustum.horseshoecrab.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+      "MobCategoryMixin"
   ],
   "injectors": {
     "defaultRequire": 1
