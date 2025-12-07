@@ -28,7 +28,7 @@ class ModEntitySpawns {
             )
             SpawnPlacements.register(
                 ModEntities.HORSESHOE_CRAB,
-                SpawnPlacementTypes.IN_WATER,
+                SpawnPlacementTypes.NO_RESTRICTIONS,
                 Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 HorseshoeCrabEntity::canSpawn,
             )

@@ -1,6 +1,5 @@
 package com.aburustum.horseshoecrab.entity.custom
 
-import com.aburustum.horseshoecrab.HorseshoeCrab
 import com.aburustum.horseshoecrab.entity.ModEntities
 import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ServerLevel
@@ -26,6 +25,14 @@ import net.minecraft.world.level.LevelReader
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.pathfinder.PathType
 
+// TODO Ideas:
+//  - bool isMale determines size, partners when mating season
+//  - disable breeding, change spawn rules when full or new moon to be on beach and in mating state
+//  - make Bucketable
+//  - use nautilus as food when available
+//  - Make swim upside down
+//  - goal to prefer walking along bottom of water over swimming
+//  - goal to return to water from land (except when full/new moon and still mating)
 class HorseshoeCrabEntity(entityType: EntityType<out HorseshoeCrabEntity>, world: Level) : Animal(entityType, world) {
     val idleAnimationState: AnimationState = AnimationState()
     private var idleAnimationTimeout = 0
@@ -54,23 +61,9 @@ class HorseshoeCrabEntity(entityType: EntityType<out HorseshoeCrabEntity>, world
 
             val blockBelow = world.getBlockState(pos.below())
 
-            val shouldSpawn =
-                pos.y in shallowDepthMin..shallowDepthMax
-                    && blockBelow.isSolid
-                    && world.canSeeSkyFromBelowWater(pos)
-
-            if (shouldSpawn) {
-                HorseshoeCrab.LOGGER.info("✓ Spawning horseshoe crab @ $pos)")
-            } else {
-                HorseshoeCrab.LOGGER.info(
-                    "X Failed to spawn at $pos. {}, {}, {}",
-                    pos.y in shallowDepthMin..shallowDepthMax,
-                    blockBelow.isSolid,
-                    world.canSeeSkyFromBelowWater(pos),
-                )
-            }
-
-            return shouldSpawn
+            return pos.y in shallowDepthMin..shallowDepthMax
+                && blockBelow.isSolid
+                && world.canSeeSkyFromBelowWater(pos)
         }
     }
 
