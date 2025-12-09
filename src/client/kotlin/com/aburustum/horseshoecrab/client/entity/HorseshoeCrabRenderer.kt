@@ -37,12 +37,12 @@ class HorseshoeCrabRenderer(context: EntityRendererProvider.Context) :
         orderedRenderCommandQueue: SubmitNodeCollector,
         cameraRenderState: CameraRenderState,
     ) {
-        if (state.isBaby) {
-            matrixStack.scale(0.5f, 0.5f, 0.5f)
-        } else {
-            matrixStack.scale(1.0f, 1.0f, 1.0f)
+        var scale: Float = if (state.isBaby) 0.5f else 1.0f
+        scale *= when (state.variant) {
+            HorseshoeCrabVariant.MALE -> 0.8f
+            HorseshoeCrabVariant.FEMALE -> 1.0f
         }
-
+        matrixStack.scale(scale, scale, scale)
         super.submit(state, matrixStack, orderedRenderCommandQueue, cameraRenderState)
     }
 

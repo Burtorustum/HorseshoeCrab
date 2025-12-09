@@ -35,7 +35,7 @@ import net.minecraft.world.level.storage.ValueInput
 import net.minecraft.world.level.storage.ValueOutput
 
 // TODO Ideas:
-//  - male/female variants determine size, partners when mating season
+//  - male/female variants determine partners when mating season
 //  - disable player breeding, change spawn rules when full or new moon to be on beach and in mating state
 //  - make Bucketable
 //  - use nautilus as food when available
